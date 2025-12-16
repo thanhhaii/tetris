@@ -15,8 +15,8 @@
 
 using namespace std;
 
-#define H 20
-#define W 15
+#define H 22
+#define W 16
 
 char board[H][W];
 int x, y, b;
@@ -28,6 +28,15 @@ int getch_cross() { return _getch(); }
 bool kbhit_cross() { return _kbhit(); }
 void sleep_ms(int ms) { Sleep(ms); }
 void clearScreen() { system("cls"); }
+
+// Enable colors on Windows
+void enableColors() {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD dwMode = 0;
+    GetConsoleMode(hOut, &dwMode);
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(hOut, dwMode);
+}
 #else
 int getch_cross() {
     termios oldt, newt;
@@ -71,9 +80,22 @@ void sleep_ms(int ms) {
 }
 
 void clearScreen() {
-    system("clear");
+    cout << "\033[2J\033[1;1H";
 }
+
+void enableColors() {}
 #endif
+
+/* ================= COLOR CODES ================= */
+#define RESET   "\033[0m"
+#define CYAN    "\033[36m"
+#define YELLOW  "\033[33m"
+#define MAGENTA "\033[35m"
+#define GREEN   "\033[32m"
+#define RED     "\033[31m"
+#define BLUE    "\033[34m"
+#define WHITE   "\033[37m"
+#define GRAY    "\033[90m"
 
 /* ================= TETRIS DATA ================= */
 
@@ -87,12 +109,35 @@ char blocks[][4][4] = {
     {{' ',' ',' ',' '},{' ',' ','L',' '},{'L','L','L',' '},{' ',' ',' ',' '}}
 };
 
+/* ================= HELPER FUNCTIONS ================= */
+
+string getColor(char c) {
+    switch(c) {
+        case 'I': return CYAN;
+        case 'O': return YELLOW;
+        case 'T': return MAGENTA;
+        case 'S': return GREEN;
+        case 'Z': return RED;
+        case 'J': return BLUE;
+        case 'L': return WHITE;
+        case '#': return GRAY;
+        default: return RESET;
+    }
+}
+
+string getBlockChar(char c) {
+    if (c == ' ') return "  ";
+    if (c == '#') return "██";  // Viền
+    return "▓▓";  // Khối Tetris
+}
+
 /* ================= GAME LOGIC ================= */
 
 void initBoard() {
     for (int i = 0; i < H; i++)
-        for (int j = 0; j < W; j++)
+        for (int j = 0; j < W; j++) {
             board[i][j] = (i == 0 || i == H-1 || j == 0 || j == W-1) ? '#' : ' ';
+        }
 }
 
 bool canMove(int dx, int dy) {
@@ -124,8 +169,10 @@ void boardDelBlock() {
 void draw() {
     clearScreen();
     for (int i = 0; i < H; i++) {
-        for (int j = 0; j < W; j++)
-            cout << board[i][j];
+        for (int j = 0; j < W; j++) {
+            char c = board[i][j];
+            cout << getColor(c) << getBlockChar(c) << RESET;
+        }
         cout << endl;
     }
 }
@@ -153,9 +200,10 @@ void removeLine() {
 /* ================= MAIN ================= */
 
 int main() {
+    enableColors();
     srand(time(0));
     initBoard();
-    x = 5; y = 1; b = rand() % 7;
+    x = 6; y = 1; b = rand() % 7;
 
     while (true) {
         boardDelBlock();
@@ -166,18 +214,23 @@ int main() {
             if (c == 'd' && canMove(1,0))  x++;
             if (c == 's' && canMove(0,1))  y++;
             if (c == 'q') break;
+
+            block2Board();
+            draw();
+            sleep_ms(50);
+            continue;
         }
 
         if (canMove(0,1)) y++;
         else {
             block2Board();
             removeLine();
-            x = 5; y = 1; b = rand() % 7;
+            x = 6; y = 1; b = rand() % 7;
         }
 
         block2Board();
         draw();
-        sleep_ms(400);
+        sleep_ms(200);
     }
 
     return 0;
