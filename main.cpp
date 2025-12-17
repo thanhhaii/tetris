@@ -19,7 +19,7 @@ using namespace std;
 #define W 16
 
 char board[H][W];
-int x, y, b;
+int x, y, b, speed = 300;
 
 /* ================= INPUT CROSS PLATFORM ================= */
 
@@ -224,7 +224,8 @@ void removeLine() {
                     board[ii][jj] = board[ii-1][jj];
             i++;
             draw();
-            sleep_ms(200);
+            speed = max(50, speed - 10);
+            sleep_ms(speed);
         }
     }
 }
@@ -263,7 +264,7 @@ int main() {
 
         block2Board();
         draw();
-        sleep_ms(200);
+        sleep_ms(speed);
     }
 
     return 0;
