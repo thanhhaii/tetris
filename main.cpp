@@ -88,6 +88,7 @@ void enableColors() {}
 
 /* ================= COLOR CODES ================= */
 #define RESET   "\033[0m"
+#define BOLD    "\033[1m"
 #define CYAN    "\033[36m"
 #define YELLOW  "\033[33m"
 #define MAGENTA "\033[35m"
@@ -237,6 +238,16 @@ int main() {
     srand(time(0));
     initBoard();
     x = 6; y = 1; b = rand() % 7;
+
+    cout << BOLD << CYAN;
+    cout << "\n╔══════════════════════════════════════════════════╗\n";
+    cout << "║                                                  ║\n";
+    cout << "║           WELCOME TO TETRIS GAME!                ║\n";
+    cout << "║                                                  ║\n";
+    cout << "║         Press any key to start...                ║\n";
+    cout << "║                                                  ║\n";
+    cout << "╚══════════════════════════════════════════════════╝\n" << RESET;
+    getch_cross();
 
     while (true) {
         boardDelBlock();
