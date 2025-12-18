@@ -271,6 +271,18 @@ int main() {
             block2Board();
             removeLine();
             x = 6; y = 1; b = rand() % 7;
+
+            if(!canMove(0,1)){
+                block2Board();
+                clearScreen();
+                cout << "\n" << BOLD << RED;
+                cout << "  ╔════════════════════════════════════════════╗\n";
+                cout << "  ║           GAME OVER!                       ║\n";
+                cout << "  ║         Final Score:                       ║\n";
+                cout << "  ╚════════════════════════════════════════════╝\n" << RESET;
+                break;
+            }
+
         }
 
         block2Board();
