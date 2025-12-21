@@ -211,6 +211,17 @@ void draw() {
     }
 }
 
+void lineClearAnimation(int row) {
+    for (int t = 0; t < 3; t++) {
+        // Nhấp nháy
+        for (int j = 1; j < W-1; j++)
+            board[row][j] = (t % 2 == 0) ? '#' : ' ';
+
+        draw();
+        sleep_ms(80);
+    }
+}
+
 void removeLine() {
     for (int i = H-2; i > 0; i--) {
         bool full = true;
@@ -222,14 +233,41 @@ void removeLine() {
 
         if (full) {
             AudioManager::playSound("./assets/collect-points.mp3");
+            lineClearAnimation(i);
             for (int ii = i; ii > 1; ii--)
                 for (int jj = 1; jj < W-1; jj++)
                     board[ii][jj] = board[ii-1][jj];
-            i++;
-            draw();
+
+            // Xoá dòng trên cùng
+            for (int jj = 1; jj < W-1; jj++)
+                board[1][jj] = ' ';
+
+            i++; // kiểm tra lại dòng vừa rơi xuống
+
             speed = max(50, speed - 10);
-            sleep_ms(speed);
+            draw();
+            sleep_ms(80);
         }
+    }
+}
+
+void screenShake(int times = 10, int strength = 2, int delay = 30) {
+    for (int i = 0; i < times; i++) {
+        clearScreen();
+
+        int offset = (i % 2 == 0) ? strength : -strength;
+
+        for (int y = 0; y < H; y++) {
+            if (offset > 0)
+                cout << string(offset * 2, ' ');
+
+            for (int x = 0; x < W; x++) {
+                char c = board[y][x];
+                cout << getColor(c) << getBlockChar(c) << RESET;
+            }
+            cout << endl;
+        }
+        sleep_ms(delay);
     }
 }
 
@@ -282,6 +320,7 @@ int main() {
         if (canMove(0,1)) y++;
         else {
             block2Board();
+            screenShake(12, 1, 25);
             removeLine();
             x = 6; y = 1; b = rand() % 7;
 
