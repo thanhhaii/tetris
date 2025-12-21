@@ -21,6 +21,7 @@ This is a classic Tetris game that runs in the terminal. It features a game boar
 - **Audio support**: Background music and sound effects (via AudioManager)
 - **Terminal utilities**: Enhanced console rendering with colors and cursor control
 - **Score tracking**: Keep track of your score as you play
+- **Persistent high scores**: Save and display top 10 high scores from all games
 - **Progressive difficulty**: Game speed increases as you score more points
 
 ## Project Structure
@@ -30,15 +31,17 @@ Tetris/
 ├── main.cpp              # Main game logic and implementation
 ├── include/
 │   ├── AudioManager.h    # Audio handling interface
-│   └── ConsoleHelper.h   # Terminal utility functions
+│   ├── ConsoleHelper.h   # Terminal utility functions
+│   └── ScoreManager.h    # Score storage and display interface
 └── src/
     ├── AudioManager.cpp  # Audio implementation
-    └── ConsoleHelper.cpp # Console utility implementation
+    ├── ConsoleHelper.cpp # Console utility implementation
+    └── ScoreManager.cpp  # Score storage and display implementation
 ```
 
 ## Requirements
 
-- C++ compiler (C++11 or later)
+- C++ compiler (C++17 or later)
 - Standard library
 
 ## Building
@@ -46,7 +49,7 @@ Tetris/
 Compile the project using your preferred C++ compiler:
 
 ```bash
-g++ -o tetris main.cpp src/AudioManager.cpp src/ConsoleHelper.cpp -I./
+g++ -std=c++17 ./src/*.cpp  main.cpp -o tetris
 ```
 
 ## Running
