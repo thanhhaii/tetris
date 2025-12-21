@@ -5,6 +5,7 @@
 #include <chrono>
 #include "./include/AudioManager.h"
 #include "./include/ConsoleHelper.h"
+#include "./include/ScoreManager.h"
 
 #ifdef _WIN32
     #include <conio.h>
@@ -345,6 +346,30 @@ int main() {
                 cout << "  ║           GAME OVER!                       \n";
                 cout << "  ║         Final Score:     " << score << "   \n";
                 cout << "  ╚════════════════════════════════════════════\n" << RESET;
+                
+                enableEcho();
+                
+                // Get player name and save score
+                cout << "\n" << BOLD << WHITE << "Enter your name: " << RESET;
+                string playerName;
+                getline(cin, playerName);
+                
+                // Handle empty name
+                if (playerName.empty()) {
+                    playerName = "Anonymous";
+                }
+                
+                // Save score
+                ScoreManager::saveScore(playerName, score);
+                
+                // Display high scores
+                sleep_ms(500);
+                ScoreManager::displayScores();
+                resetTerminal();
+
+                cout << "\n" << BOLD << CYAN << "Press any key to exit..." << RESET;
+                getch_cross();
+                
                 break;
             }
 
