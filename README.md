@@ -33,10 +33,12 @@ Tetris/
 │   ├── AudioManager.h    # Audio handling interface
 │   ├── ConsoleHelper.h   # Terminal utility functions
 │   └── ScoreManager.h    # Score storage and display interface
+│   └── UIHelper.h        # Helper handling UI
 └── src/
     ├── AudioManager.cpp  # Audio implementation
     ├── ConsoleHelper.cpp # Console utility implementation
     └── ScoreManager.cpp  # Score storage and display implementation
+    └── UIHelper.cpp      # UI helper implementation
 ```
 
 ## Requirements
