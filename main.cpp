@@ -320,13 +320,13 @@ int main() {
         if (canMove(0,1)) y++;
         else {
             block2Board();
-            screenShake(12, 1, 25);
             removeLine();
             x = 6; y = 1; b = rand() % 7;
 
             if(!canMove(0,1)){
                 AudioManager::stopBackgroundMusic();
                 block2Board();
+                screenShake(12, 1, 25);
                 clearScreen();
                 cout << "\n" << BOLD << RED;
                 cout << "  ╔════════════════════════════════════════════╗\n";
