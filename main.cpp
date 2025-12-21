@@ -4,6 +4,7 @@
 #include <thread>
 #include <chrono>
 #include "./include/AudioManager.h"
+#include "./include/ConsoleHelper.h"
 
 #ifdef _WIN32
     #include <conio.h>
@@ -20,7 +21,7 @@ using namespace std;
 #define W 16
 
 char board[H][W];
-int x, y, b, speed = 300;
+int x, y, b, score, speed = 300;
 
 /* ================= INPUT CROSS PLATFORM ================= */
 
@@ -28,16 +29,6 @@ int x, y, b, speed = 300;
 int getch_cross() { return _getch(); }
 bool kbhit_cross() { return _kbhit(); }
 void sleep_ms(int ms) { Sleep(ms); }
-void clearScreen() { system("cls"); }
-
-// Enable colors on Windows
-void enableColors() {
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    DWORD dwMode = 0;
-    GetConsoleMode(hOut, &dwMode);
-    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-    SetConsoleMode(hOut, dwMode);
-}
 #else
 int getch_cross() {
     termios oldt, newt;
@@ -79,12 +70,6 @@ bool kbhit_cross() {
 void sleep_ms(int ms) {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
-
-void clearScreen() {
-    cout << "\033[2J\033[1;1H";
-}
-
-void enableColors() {}
 #endif
 
 /* ================= COLOR CODES ================= */
@@ -202,6 +187,9 @@ void boardDelBlock() {
 
 void draw() {
     clearScreen();
+
+    cout << BOLD << GREEN << "Score: " << score << "\t" << BOLD << WHITE << "Speed: " << speed << "ms" << "\n\n" << RESET;
+
     for (int i = 0; i < H; i++) {
         for (int j = 0; j < W; j++) {
             char c = board[i][j];
@@ -222,7 +210,19 @@ void lineClearAnimation(int row) {
     }
 }
 
+void calculateScore(int& score, int linesCleared) {
+    switch (linesCleared) {
+        case 1: score += 100; break;
+        case 2: score += 300; break;
+        case 3: score += 500; break;
+        case 4: score += 800; break;
+        default: break;
+    }
+};
+
 void removeLine() {
+    int clearedCount = 0;
+
     for (int i = H-2; i > 0; i--) {
         bool full = true;
         for (int j = 1; j < W-1; j++)
@@ -243,12 +243,18 @@ void removeLine() {
                 board[1][jj] = ' ';
 
             i++; // kiểm tra lại dòng vừa rơi xuống
-
+            clearedCount++;
+            
             speed = max(50, speed - 10);
             draw();
             sleep_ms(80);
         }
+
     }
+
+    if (clearedCount > 0) {
+        calculateScore(score, clearedCount);
+    };
 }
 
 void screenShake(int times = 10, int strength = 2, int delay = 30) {
@@ -279,7 +285,12 @@ int main() {
     srand(time(0));
     initBoard();
     x = 6; y = 1; b = rand() % 7;
-    AudioManager::playBackgroundMusic("./assets/background-music.mp3", true);
+    score = 0;
+    
+    hideCursor(); 
+    disableEcho();
+
+    AudioManager::playBackgroundMusic("./assets/background-music.mp3", false);
 
     cout << BOLD << CYAN;
     cout << "\n╔══════════════════════════════════════════════════╗\n";
@@ -291,6 +302,7 @@ int main() {
     cout << "╚══════════════════════════════════════════════════╝\n" << RESET;
     getch_cross();
     AudioManager::stopBackgroundMusic();
+    sleep_ms(300);
 
     bool isPlayingBackgroundMusic = false;
 
@@ -329,10 +341,10 @@ int main() {
                 screenShake(12, 1, 25);
                 clearScreen();
                 cout << "\n" << BOLD << RED;
-                cout << "  ╔════════════════════════════════════════════╗\n";
-                cout << "  ║           GAME OVER!                       ║\n";
-                cout << "  ║         Final Score:                       ║\n";
-                cout << "  ╚════════════════════════════════════════════╝\n" << RESET;
+                cout << "  ╔════════════════════════════════════════════\n";
+                cout << "  ║           GAME OVER!                       \n";
+                cout << "  ║         Final Score:     " << score << "   \n";
+                cout << "  ╚════════════════════════════════════════════\n" << RESET;
                 break;
             }
 
@@ -343,5 +355,6 @@ int main() {
         sleep_ms(speed);
     }
 
+    resetTerminal();
     return 0;
 }
