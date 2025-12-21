@@ -3,6 +3,7 @@
 #include <ctime>
 #include <thread>
 #include <chrono>
+#include "./include/AudioManager.h"
 
 #ifdef _WIN32
     #include <conio.h>
@@ -231,10 +232,8 @@ void removeLine() {
             }
 
         if (full) {
-            // Animation xoá dòng
+            AudioManager::playSound("./assets/collect-points.mp3");
             lineClearAnimation(i);
-
-            // Dồn dòng xuống
             for (int ii = i; ii > 1; ii--)
                 for (int jj = 1; jj < W-1; jj++)
                     board[ii][jj] = board[ii-1][jj];
@@ -275,10 +274,12 @@ void screenShake(int times = 10, int strength = 2, int delay = 30) {
 /* ================= MAIN ================= */
 
 int main() {
+    AudioManager::init();
     enableColors();
     srand(time(0));
     initBoard();
     x = 6; y = 1; b = rand() % 7;
+    AudioManager::playBackgroundMusic("./assets/background-music.mp3", true);
 
     cout << BOLD << CYAN;
     cout << "\n╔══════════════════════════════════════════════════╗\n";
@@ -289,8 +290,17 @@ int main() {
     cout << "║                                                  ║\n";
     cout << "╚══════════════════════════════════════════════════╝\n" << RESET;
     getch_cross();
+    AudioManager::stopBackgroundMusic();
+
+    bool isPlayingBackgroundMusic = false;
 
     while (true) {
+        if (isPlayingBackgroundMusic == false) {
+            isPlayingBackgroundMusic = true;
+            AudioManager::playBackgroundMusic("./assets/game-sound.mp3", true);
+        }
+        
+
         boardDelBlock();
 
         if (kbhit_cross()) {
@@ -315,6 +325,7 @@ int main() {
             x = 6; y = 1; b = rand() % 7;
 
             if(!canMove(0,1)){
+                AudioManager::stopBackgroundMusic();
                 block2Board();
                 clearScreen();
                 cout << "\n" << BOLD << RED;
